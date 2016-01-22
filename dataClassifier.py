@@ -72,13 +72,61 @@ def enhancedFeatureExtractorDigit(datum):
     for this datum (datum is of type samples.Datum).
 
     ## DESCRIBE YOUR ENHANCED FEATURES HERE...
+    1. whitespace feature: check for 'whitespaces' by checking if the pixel is surrounded by few/many 'inactive' pixels (gaps).
 
+    2. top-heavy feature: check if there are more pixels in the upper half of the digit than in the under half.
     ##
     """
     features =  basicFeatureExtractorDigit(datum)
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    #whitespace feature
+    x = 0
+    for w in range(DIGIT_DATUM_WIDTH):
+        temp = False
+        temporary = False
+        whiteSpace = False
+        noWhiteSpace = 0     
+        for h in range(DIGIT_DATUM_HEIGHT):
+            pix = datum.getPixel(w, h)
+            if pix > 0:
+                if temp == False:
+                    temp = True
+                elif whiteSpace == True:
+                    temporary = True
+            elif pix == 0 and temp == True:
+                if whiteSpace == False:
+                    whiteSpace = True
+                elif whiteSpace == True and temporary == True:
+                    noWhiteSpace += True
+                    temp = False
+                    whiteSpace = False
+                    temporary = False
+            if noWhiteSpace > 0:
+                features[str(x) + 'whitespace'] = 1
+            else:
+                features[str(x) + 'whitespace'] = 0
+            x += 1
+
+    #top-heavy feature
+    underPix = 0
+    for w in range(DIGIT_DATUM_WIDTH):
+        for h in range(DIGIT_DATUM_HEIGHT/2, DIGIT_DATUM_HEIGHT):
+            if datum.getPixel(w, h) > 0:
+                underPix += 1
+    upperPix = 0
+    for w in range(DIGIT_DATUM_WIDTH):
+        for h in range(DIGIT_DATUM_HEIGHT/2):
+             if datum.getPixel(w, h) > 0:
+                upperPix += 1
+
+    if (upperPix - underPix) > 0:
+        features['top-heavy'] = 1
+    else:
+        features['top-heavy'] = 0
+    #add multiple times to give the feature an extra weight (number chosen by testing it with different values)
+    for n in range(3):
+        features[str(n) + 'top-heavy'] = features['top-heavy']
 
     return features
 

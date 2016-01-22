@@ -62,47 +62,54 @@ class MiraClassifier:
         """
         "*** YOUR CODE HERE ***"
         cWeights = util.Counter()
-        for c in Cgrid:
-            cWeights[c] = self.weights.copy()
+        for cValue in Cgrid:
+            cWeights[cValue] = self.weights.copy()
+            #same code as perceptron
             for iteration in range(self.max_iterations):
                 print "Starting iteration ", iteration, "..."
                 for i in range(len(trainingData)):
-                    "*** YOUR CODE HERE ***"
-                    
                     actualLabel = trainingLabels[i]
                     datum = trainingData[i]
                     
                     #guess for single instance
                     score = util.Counter()
-                    for l in self.legalLabels:
-                        score[l] = cWeights[c][l] * datum
+                    for label in self.legalLabels:
+                        score[label] = cWeights[cValue][label] * datum
 
-                    label = score.argMax()
-                    if label != actualLabel:
-                        tau = min(c, ((cWeights[c][label]-cWeights[c][actualLabel]) * datum + 1.0) / (2 * (datum * datum)))
+                    #get the label with the highest score
+                    highestScore = score.argMax()
+                    if highestScore != actualLabel:
+                        #calculate tau with the given formula
+                        tau = min(cValue, ((cWeights[cValue][highestScore] - cWeights[cValue][actualLabel]) * datum + 1.0) / (2 * (datum * datum)))
                         tauDatum = datum.copy()
                         for d in tauDatum:
                             tauDatum[d] *= tau
-                        cWeights[c][label] -= tauDatum
-                        cWeights[c][actualLabel] += tauDatum
+                        #update the weights taking tau into account
+                        cWeights[cValue][highestScore] -= tauDatum
+                        cWeights[cValue][actualLabel] += tauDatum
         
-        bestC = Cgrid[0]
+        #Evaluate which c value has the best accuracy
+        dataLength = len(validationData)
         accuracy = 0
-        numData = len(validationData)
-        for c in Cgrid:
-            correctGuesses = 0
+        bestCValue = Cgrid[0]
+        for cValue in Cgrid:
             index = 0
-            self.weights = cWeights[c]
+            correctGuesses = 0
+            self.weights = cWeights[cValue]
             guesses = self.classify(validationData)
-            for guess in guesses:
-                if guess == validationLabels[index]:
+            for g in guesses:
+                #see if it is a correct guess
+                if g == validationLabels[index]:
                     correctGuesses += 1
                 index += 1
-            acc = correctGuesses / numData
+            #calculate the accuracy
+            acc = correctGuesses / dataLength
+            #see if the calculated accuracy is better than the best accuracy until now
             if acc > accuracy:
+                #if it is, update the values
+                bestCValue = cValue
                 accuracy = acc
-                bestC = c
-        self.weights = cWeights[bestC]
+        self.weights = cWeights[bestCValue]
 
     def classify(self, data ):
         """
