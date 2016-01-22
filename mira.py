@@ -64,7 +64,7 @@ class MiraClassifier:
         cWeights = util.Counter()
         for cValue in Cgrid:
             cWeights[cValue] = self.weights.copy()
-            #same code as perceptron
+            #same code as perceptron, for the most part
             for iteration in range(self.max_iterations):
                 print "Starting iteration ", iteration, "..."
                 for i in range(len(trainingData)):
@@ -79,8 +79,9 @@ class MiraClassifier:
                     #get the label with the highest score
                     highestScore = score.argMax()
                     if highestScore != actualLabel:
-                        #calculate tau with the given formula
+                        #calculate tau with the given formula, this is where MIRA differs from our multiclass perceptron
                         tau = min(cValue, ((cWeights[cValue][highestScore] - cWeights[cValue][actualLabel]) * datum + 1.0) / (2 * (datum * datum)))
+                        #update the Data with the tau value
                         tauDatum = datum.copy()
                         for d in tauDatum:
                             tauDatum[d] *= tau

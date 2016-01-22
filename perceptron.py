@@ -59,12 +59,17 @@ class PerceptronClassifier:
                 datum = trainingData[i]
                 
                 #guess for single instance
+                """We did not use the classify method here because it returns a list of all guesses, 
+                in this instance we want to train our method and thus use input of earlier test cases
+                to make a better guess next time"""
                 score = util.Counter()
                 for label in self.legalLabels:
                     score[label] = self.weights[label] * datum
                     
                 #get the label with the highest score
                 highestScore = score.argMax()
+                
+                #If we guessed wrong
                 if highestScore != actualLabel:
                     #update the weights
                     self.weights[highestScore] -= datum
@@ -93,7 +98,7 @@ class PerceptronClassifier:
         featuresWeights = []
 
         "*** YOUR CODE HERE ***"
-        #sort the features
+        #sort the features of the particular label
         featuresWeights = self.weights[label].sortedKeys()
         #delete evey feature after 100
         del featuresWeights[100:]

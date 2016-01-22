@@ -172,7 +172,50 @@ def enhancedPacmanFeatures(state, action):
     """
     features = util.Counter()
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    #instantiate some recurring variables
+    pacmanPosition = state.getPacmanPosition()
+    ghostPositions = state.getGhostPositions()
+    foodPositions = state.getFood().asList()
+    powerupPositions = state.getCapsules()
+    xCentre = (DIGIT_DATUM_WIDTH/2)
+    
+    """Feature 1: returns the manhattanDistance to the nearest ghost"""
+    minGhostDist = 99999
+    retDist = 0
+    #for every ghost check whether it is closer
+    for ghost in ghostPositions:
+        gDist = util.manhattanDistance(ghost, pacmanPosition)
+        if gDist < minGhostDist:
+            minGhostDist = gDist
+    if minGhostDist < 5:
+        retDist = 1
+    features[0] = retDist
+
+    """Feature 2: returns 1 if the majority of the ghosts are on the left side"""
+    leftGhostCount = 0
+    retLG = 0
+    for ghost in ghostPositions:
+        xG, yG = ghost
+        if xG <= xCentre:
+            leftGhostCount += 1
+    if leftGhostCount >= len(ghostPositions)/2:
+        retLG = 1
+    features[1] = retLG
+
+    """Feature 3: returns 1 if the majority of the pellets are on the left side"""
+    leftFoodCount = 0
+    retLF = 0
+    for food in foodPositions:
+        xF,yF = food
+        if xF < xCentre:
+            leftFoodCount += 1
+    if leftFoodCount >= len(foodPositions)/2:
+        retLF = 1
+    features[2] = retLF
+            
+    
+    
     return features
 
 
